@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, computed, ComputedRef } from "vue";
-import { getPosts } from "@/backend/dataApi";
+import { getPosts, getUserPosts } from "@/backend/dataApi";
 import Post from "@/types/PostType";
 import VPagination from "@hennge/vue3-pagination";
 import "@hennge/vue3-pagination/dist/vue3-pagination.css";
@@ -41,8 +41,10 @@ export default defineComponent({
       filter: string;
       page: number;
       size: number;
+      userItems: Post[];
     }>({
       items: [],
+      userItems: [],
       filter: "",
       page: 1,
       size: 20,
@@ -52,16 +54,21 @@ export default defineComponent({
       const res = await getPosts();
       state.items = res;
     };
+    const getUserItems = async () => {
+      const res = await getUserPosts(4);
+      state.userItems = res;
+    };
 
     const changeFilter = (val: string = "") => {
       state.filter = val;
     };
 
     getItems();
-
+    getUserItems();
     const filteredItems = computed(() => {
+      state.page = 1;
       if (state.filter === "my") {
-        return state.items.filter((item) => item.userId === 4);
+        return state.userItems;
       }
       if (state.filter === "asc") {
         return state.items.sort((a, b) => a.id - b.id);

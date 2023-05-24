@@ -23,9 +23,17 @@ async function getPosts() {
     }
 }
 
-
+async function getUserPosts(userId:number) {
+    try{
+        const res = await http.get(`users/${userId}/posts`);
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
 
 export {
     getUserInfo,
-    getPosts
+    getPosts,
+    getUserPosts
 }
