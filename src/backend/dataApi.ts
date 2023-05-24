@@ -14,8 +14,18 @@ async function getUserInfo(id: number) {
     }
 }
 
+async function getPosts() {
+    try{
+        const res = await http.get('posts');
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
+
 
 
 export {
     getUserInfo,
+    getPosts
 }

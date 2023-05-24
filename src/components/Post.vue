@@ -1,15 +1,13 @@
-<template>
-  <div class="card"></div>
-</template>
+<template></template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, reactive, PropType } from "vue";
+import PostType from "@/types/PostType";
+
 export default defineComponent({
-  data() {
-    return {};
-  },
+  setup() {},
 });
 </script>
 
-<style lang="sass"  scoped>
+<style scoped>
 </style>
