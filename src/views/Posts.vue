@@ -7,34 +7,45 @@
       <button @click="changeFilter()">All</button>
     </div>
     <div class="container">
-      <div class="card" v-for="item in filteredItems" :key="item.id">
+      <div class="card" v-for="item in paginatedData" :key="item.id">
         <h2>{{ item.title }}</h2>
+        <h3>{{ item.id }}</h3>
       </div>
     </div>
-
-    <Post />
+    <div class="pagination">
+      <v-pagination
+        class="page"
+        v-model="state.page"
+        :pages="pageCount"
+        :range-size="1"
+        active-color="green"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Post from "@/components/Post.vue"; // @ is an alias to /src
-import { defineComponent, reactive, computed } from "vue";
+import { defineComponent, reactive, computed, ComputedRef } from "vue";
 import { getPosts } from "@/backend/dataApi";
-import PostType from "@/types/PostType";
+import Post from "@/types/PostType";
+import VPagination from "@hennge/vue3-pagination";
+import "@hennge/vue3-pagination/dist/vue3-pagination.css";
 
 export default defineComponent({
   components: {
-    Post,
+    VPagination,
   },
   setup() {
     const state = reactive<{
-      items: PostType[];
-      filteredItems: PostType[];
+      items: Post[];
       filter: string;
+      page: number;
+      size: number;
     }>({
       items: [],
       filter: "",
-      filteredItems: [],
+      page: 1,
+      size: 20,
     });
 
     const getItems = async () => {
@@ -63,10 +74,27 @@ export default defineComponent({
       return state.items;
     });
 
+    const pageCount = computed(() => {
+      let l = filteredItems.value.length;
+      let s = state.size;
+      if (l <= s) {
+        return 1;
+      }
+      return Math.floor(l / s);
+    });
+
+    const paginatedData = computed(() => {
+      let start = (state.page - 1) * state.size;
+      let end = start + state.size;
+      return filteredItems.value.slice(start, end);
+    });
+
     return {
       state,
-      filteredItems,
       changeFilter,
+
+      paginatedData,
+      pageCount,
     };
   },
 });
@@ -119,5 +147,24 @@ button:hover {
 .card:hover {
   background-color: black;
   color: green;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.page :deep(.Page) {
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 30px;
+  height: 40px;
+  width: 40px;
+}
+.page :deep(.Control) {
+  height: 35px;
+  width: 35px;
 }
 </style>
