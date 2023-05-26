@@ -4,12 +4,16 @@
       <button @click="changeFilter('asc')">Sort a-b</button>
       <button @click="changeFilter('desc')">Sort b-a</button>
       <button @click="changeFilter('my')">My posts</button>
-      <button @click="changeFilter()">All</button>
+      <button @click="changeFilter('asc')">All</button>
     </div>
     <div class="container">
-      <div class="card" v-for="item in paginatedData" :key="item.id">
+      <div
+        class="card"
+        v-for="item in paginatedData"
+        :key="item.id"
+        @click="go(item)"
+      >
         <h2>{{ item.title }}</h2>
-        <h3>{{ item.id }}</h3>
       </div>
     </div>
     <div class="pagination">
@@ -25,8 +29,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, computed, ComputedRef } from "vue";
+import { defineComponent, reactive, computed } from "vue";
 import { getPosts, getUserPosts } from "@/backend/dataApi";
+import { useRouter } from "vue-router";
+
 import Post from "@/types/PostType";
 import VPagination from "@hennge/vue3-pagination";
 import "@hennge/vue3-pagination/dist/vue3-pagination.css";
@@ -36,10 +42,13 @@ export default defineComponent({
     VPagination,
   },
   setup() {
+    const router = useRouter();
+
     const state = reactive<{
       items: Post[];
       filter: string;
       page: number;
+      authorisedUser: number;
       size: number;
       userItems: Post[];
     }>({
@@ -47,15 +56,20 @@ export default defineComponent({
       userItems: [],
       filter: "",
       page: 1,
+      authorisedUser: 4,
       size: 20,
     });
+
+    const go = (item: Post) => {
+      router.push("post?id=" + item.id + "&userId=" + item.userId);
+    };
 
     const getItems = async () => {
       const res = await getPosts();
       state.items = res;
     };
     const getUserItems = async () => {
-      const res = await getUserPosts(4);
+      const res = await getUserPosts(state.authorisedUser);
       state.userItems = res;
     };
 
@@ -65,6 +79,7 @@ export default defineComponent({
 
     getItems();
     getUserItems();
+
     const filteredItems = computed(() => {
       state.page = 1;
       if (state.filter === "my") {
@@ -99,9 +114,9 @@ export default defineComponent({
     return {
       state,
       changeFilter,
-
       paginatedData,
       pageCount,
+      go,
     };
   },
 });
@@ -147,6 +162,7 @@ button:hover {
   width: 50vw;
   padding: 20px;
   background-color: green;
+  border-radius: 15px;
   color: black;
   cursor: pointer;
 }

@@ -23,6 +23,24 @@ async function getPosts() {
     }
 }
 
+async function getComments(postId:number) {
+    try{
+        const res = await http.get('posts/' + postId + '/comments');
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+async function getSelectedPost(postId:number) {
+    try{
+        const res = await http.get('posts/' + postId);
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
+
 async function getUserPosts(userId:number) {
     try{
         const res = await http.get(`users/${userId}/posts`);
@@ -32,8 +50,48 @@ async function getUserPosts(userId:number) {
     }
 }
 
+async function changeSelectedPostBody(postId:number, body:string) {
+    try{
+        const res = await http.patch('posts/' + postId,
+        {
+            body
+        });
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+async function deleteSelectedPost(postId:number) {
+    try{
+        await http.delete('posts/' + postId);
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+async function sentComment(newName: string, newBody: string, authorisedUserEmail: string) {
+    try{
+        const res = await http.post('posts',
+        {
+            name:newName,
+            body:newBody,
+            email:authorisedUserEmail,
+        });
+        return res.data
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+
+
 export {
     getUserInfo,
     getPosts,
-    getUserPosts
+    getUserPosts,
+    getSelectedPost,getComments,
+    changeSelectedPostBody,
+    deleteSelectedPost,
+    sentComment
 }

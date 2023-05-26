@@ -5,4 +5,5 @@ interface Post{
     body?: string,
 }
 
+
 export default Post
