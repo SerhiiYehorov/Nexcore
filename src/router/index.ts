@@ -3,12 +3,12 @@ import Home from '../views/Posts.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/posts',
     name: 'Posts',
     component: Home
   },
   {
-    path: '/account',
+    path: '/',
     name: 'Account',
     component: () => import('../views/Account.vue')
   },

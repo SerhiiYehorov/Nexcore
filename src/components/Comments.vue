@@ -35,6 +35,8 @@
 <script lang="ts">
 import { defineComponent, reactive, watch } from "vue";
 import { getComments, sentComment } from "@/backend/dataApi";
+import { useUserStore } from "@/store/store";
+import { storeToRefs } from "pinia";
 
 import Comment from "@/types/CommentsType";
 
@@ -52,18 +54,17 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const userStore = useUserStore();
+    const { email } = storeToRefs(userStore);
+
     const state = reactive<{
       comments: Comment[];
       newName: string;
       newBody: string;
-      authorisedUser: number;
-      authorisedUserEmail: string;
     }>({
       comments: [],
       newName: "",
       newBody: "",
-      authorisedUser: 4,
-      authorisedUserEmail: "Julianne.OConner@kory.org",
     });
 
     const getCommentsData = async () => {
@@ -74,11 +75,7 @@ export default defineComponent({
     const sentNewComment = async () => {
       if (!state.newBody || !state.newName) return;
 
-      const res = await sentComment(
-        state.newName,
-        state.newBody,
-        state.authorisedUserEmail
-      );
+      const res = await sentComment(state.newName, state.newBody, email.value);
       res.id = state.comments[0].id + 1;
       state.comments.push(res);
       state.newBody = "";
@@ -109,6 +106,7 @@ export default defineComponent({
     return {
       state,
       sentNewComment,
+      email,
     };
   },
 });

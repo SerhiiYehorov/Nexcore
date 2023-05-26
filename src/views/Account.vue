@@ -4,48 +4,45 @@
     <div class="profile">
       <div class="profile__data">
         <p>Name:</p>
-        <p>{{ state.name }}</p>
+        <p>{{ name }}</p>
       </div>
       <div class="profile__data">
         <p>User:</p>
-        <p>{{ state.username }}</p>
+        <p>{{ username }}</p>
       </div>
       <div class="profile__data">
         <p>email:</p>
-        <p>{{ state.email }}</p>
+        <p>{{ email }}</p>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, computed } from "vue";
+import { defineComponent } from "vue";
 import { getUserInfo } from "@/backend/dataApi";
+import { useUserStore } from "@/store/store";
+import { storeToRefs } from "pinia";
 
 export default defineComponent({
   setup() {
-    const state = reactive<{
-      id: number;
-      name: string;
-      username: string;
-      email: string;
-    }>({
-      id: 4,
-      name: "",
-      username: "",
-      email: "",
-    });
+    const userStore = useUserStore();
+    const { id, name, email, username } = storeToRefs(userStore);
 
     const getUserData = async () => {
-      const res = await getUserInfo(state.id);
-      state.name = res.name;
-      state.username = res.username;
-      state.email = res.email;
+      const res = await getUserInfo(id.value);
+
+      name.value = res.name;
+      email.value = res.email;
+      username.value = res.username;
     };
 
     getUserData();
 
     return {
-      state,
+      id,
+      name,
+      email,
+      username,
     };
   },
 });

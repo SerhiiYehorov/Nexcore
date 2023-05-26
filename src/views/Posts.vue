@@ -32,6 +32,8 @@
 import { defineComponent, reactive, computed } from "vue";
 import { getPosts, getUserPosts } from "@/backend/dataApi";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/store";
+import { storeToRefs } from "pinia";
 
 import Post from "@/types/PostType";
 import VPagination from "@hennge/vue3-pagination";
@@ -43,12 +45,14 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
+    const userStore = useUserStore();
+
+    const { id } = storeToRefs(userStore);
 
     const state = reactive<{
       items: Post[];
       filter: string;
       page: number;
-      authorisedUser: number;
       size: number;
       userItems: Post[];
     }>({
@@ -56,7 +60,6 @@ export default defineComponent({
       userItems: [],
       filter: "",
       page: 1,
-      authorisedUser: 4,
       size: 20,
     });
 
@@ -69,7 +72,7 @@ export default defineComponent({
       state.items = res;
     };
     const getUserItems = async () => {
-      const res = await getUserPosts(state.authorisedUser);
+      const res = await getUserPosts(id.value);
       state.userItems = res;
     };
 

@@ -6,7 +6,7 @@
           <div>Title: {{ state.post.title }}</div>
           <div>
             Author: {{ state.name }}
-            <span v-if="state.authorisedUser === state.userId">(Me)</span>
+            <span v-if="id === state.userId">(Me)</span>
           </div>
         </div>
         <textarea
@@ -23,10 +23,7 @@
           v-model="state.newBody"
         />
       </div>
-      <div
-        v-if="state.post.userId === state.authorisedUser"
-        class="post__buttons"
-      >
+      <div v-if="state.post.userId === id" class="post__buttons">
         <button class="post__button" @click="state.isEdit = !state.isEdit">
           {{ editButton }}
         </button>
@@ -51,6 +48,9 @@
 <script lang="ts">
 import { defineComponent, reactive, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/store/store";
+import { storeToRefs } from "pinia";
+
 import {
   getUserInfo,
   getSelectedPost,
@@ -68,19 +68,20 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
 
+    const userStore = useUserStore();
+    const { id, name } = storeToRefs(userStore);
+
     const state = reactive<{
       postId: number;
       name: string;
       userId: number;
       post: any;
       newBody: string;
-      authorisedUser: number;
       isEdit: boolean;
     }>({
       postId: 0,
       name: "",
       userId: 0,
-      authorisedUser: 4,
       isEdit: false,
       post: {},
       newBody: "",
@@ -102,9 +103,12 @@ export default defineComponent({
       state.newBody = res.body;
     };
     const getUserData = async () => {
+      if (state.userId === id.value) {
+        state.name = name.value;
+        return;
+      }
       const res = await getUserInfo(state.userId);
       state.name = res.name;
-      state.userId = res.id;
     };
 
     const changePostData = async () => {
@@ -130,6 +134,7 @@ export default defineComponent({
       deletePost,
       editButton,
       goBack,
+      id,
     };
   },
 });

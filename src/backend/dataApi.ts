@@ -70,13 +70,13 @@ async function deleteSelectedPost(postId:number) {
     }
 }
 
-async function sentComment(newName: string, newBody: string, authorisedUserEmail: string) {
+async function sentComment(newName: string, newBody: string, email: string) {
     try{
         const res = await http.post('posts',
         {
             name:newName,
             body:newBody,
-            email:authorisedUserEmail,
+            email,
         });
         return res.data
     } catch(err) {
